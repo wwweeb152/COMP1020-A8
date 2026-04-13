@@ -24,8 +24,13 @@ class SpritePreview(QMainWindow):
         self.frames = load_sprite('spriteImages', self.num_frames)
 
         self.current_frame = 0
+
         self.timer = QTimer()
+
+        self.timer.timeout.connect(self.next_frame)
         self.setupUI()
+        self.update_fps(10)
+
 
     def setupUI(self):
         frame = QFrame()
@@ -54,9 +59,13 @@ class SpritePreview(QMainWindow):
         self.fps_slider.setTickInterval(10)
         self.fps_slider.valueChanged.connect(self.update_fps)
 
+        self.start_stop_button = QPushButton("Start")
+        self.start_stop_button.clicked.connect(self.toggle_animation)
+
         layout.addWidget(self.image_label)
         layout.addWidget(fps_row)
         layout.addWidget(self.fps_slider)
+        layout.addWidget(self.start_stop_button)
 
         self.setCentralWidget(frame)
 
@@ -64,6 +73,19 @@ class SpritePreview(QMainWindow):
         self.fps_value_label.setText(str(fps))
         delay_in_ms = int(1000 / fps)
         self.timer.setInterval(delay_in_ms)
+
+    def toggle_animation(self):
+        if self.start_stop_button.text() == "Start":
+            self.timer.start()
+            self.start_stop_button.setText("Stop")
+        else:
+            self.timer.stop()
+            self.start_stop_button.setText("Start")
+
+
+    def next_frame(self):
+        self.current_frame = (self.current_frame + 1) % self.num_frames
+        self.image_label.setPixmap(self.frames[self.current_frame])
 
 
 def main():
