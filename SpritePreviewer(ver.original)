@@ -24,7 +24,7 @@ class SpritePreview(QMainWindow):
         self.frames = load_sprite('spriteImages', self.num_frames)
 
         self.current_frame = 0
-
+        self.timer = QTimer()
         self.setupUI()
 
     def setupUI(self):
@@ -36,9 +36,34 @@ class SpritePreview(QMainWindow):
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.image_label.setPixmap(self.frames[0])
 
+        fps_row = QFrame()
+        fps_layout = QHBoxLayout()
+        fps_row.setLayout(fps_layout)
+
+        fps_text_label = QLabel("Frames per second")
+        self.fps_value_label = QLabel("10")
+
+        fps_layout.addWidget(fps_text_label)
+        fps_layout.addWidget(self.fps_value_label)
+        fps_layout.addStretch()
+
+        self.fps_slider = QSlider(Qt.Orientation.Horizontal)
+        self.fps_slider.setRange(1, 100)
+        self.fps_slider.setValue(10)
+        self.fps_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.fps_slider.setTickInterval(10)
+        self.fps_slider.valueChanged.connect(self.update_fps)
+
         layout.addWidget(self.image_label)
+        layout.addWidget(fps_row)
+        layout.addWidget(self.fps_slider)
 
         self.setCentralWidget(frame)
+
+    def update_fps(self, fps):
+        self.fps_value_label.setText(str(fps))
+        delay_in_ms = int(1000 / fps)
+        self.timer.setInterval(delay_in_ms)
 
 
 def main():
